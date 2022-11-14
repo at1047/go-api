@@ -2,7 +2,7 @@ package db
 
 import (
 	"context"
-	"encoding/json"
+	_"encoding/json"
     _"strconv"
 	"fmt"
     _"bufio"
@@ -33,7 +33,7 @@ type Ingredient struct {
 type Recipe struct {
     Name string                 `json:"name"`
     Ingredients []Ingredient    `json:"ingredients"`
-    Notes string                `json:"unit"`
+    Notes string                `json:"notes"`
 }
 
 func ConnectDB() *mongo.Collection {
@@ -97,20 +97,21 @@ func GetRecipes(ctx *gin.Context) {
 }
 
 
-func AddRecipe(context *gin.Context) {
+func AddRecipe(ctx *gin.Context) {
     var newRecipe Recipe
 
-    if err := context.BindJSON(&newRecipe); err != nil {
+    if err := ctx.BindJSON(&newRecipe); err != nil {
         return
     }
 
-    // ash := Trainer{"Ash", 10, "Pallet Town"}
+
+
     insertResult, err := coll.InsertOne(context.TODO(), newRecipe)
     if err != nil {
         log.Fatal(err)
     }
 
-    context.IndentedJSON(http.StatusCreated, newRecipe)
+    ctx.IndentedJSON(http.StatusCreated, insertResult)
 }
 
     // fmt.Println("Simple Shell")
