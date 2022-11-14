@@ -1,0 +1,53 @@
+
+# Recipes Open API
+
+openapi: 3.0.3
+
+info:
+  title: OpenAPI Specification for Recipes API
+  version: '1.0'
+  
+servers:
+  - url: http://localhost:9090/api
+
+tags:
+  - name: Recipes
+    description: Operations about Recipes
+    
+paths:
+  /recipes:
+    summary: Operations about Recipes
+    get:
+      tags:
+        - recipes
+      summary: Get all the recipes
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    ingredients:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                          quantity:
+                            type: number
+                          unit:
+                            type: string
+                    notes:
+                      type: string
+
+        400:
+          description: Incorrect input
+        # default:
+        #   description: Success
