@@ -84,11 +84,11 @@ func main() {
     // recipes := db.GetRecipes(coll)
     // fmt.Println(recipes)
     router := gin.Default()
-    router.GET("/api/recipes", db.GetRecipes)
-    router.GET("/api/recipes/:name", db.GetRecipe)
+    router.GET("/recipes", db.GetRecipes)
+    router.GET("/recipes/:name", db.GetRecipe)
     // fmt.Println(recipes)
     // router.GET("/api/recipes/{id}", GetTodo)
-    router.POST("/api/recipes", db.AddRecipe)
+    router.POST("/recipes", db.AddRecipe)
     router.Run("localhost:9090")
 }
 
