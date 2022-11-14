@@ -2,6 +2,7 @@ package main
 
 import (
     _"net/http"
+    _"github.com/gin-contrib/cors"
     "github.com/gin-gonic/gin"
     _"errors"
     _"strconv"
@@ -84,12 +85,31 @@ func main() {
     // recipes := db.GetRecipes(coll)
     // fmt.Println(recipes)
     router := gin.Default()
+    router.Use(CORSMiddleware())
+
     router.GET("/recipes", db.GetRecipes)
     router.GET("/recipes/:name", db.GetRecipe)
     // fmt.Println(recipes)
     // router.GET("/api/recipes/{id}", GetTodo)
     router.POST("/recipes", db.AddRecipe)
     router.Run("localhost:9090")
+}
+
+func CORSMiddleware() gin.HandlerFunc {
+    return func(c *gin.Context) {
+
+        c.Header("Access-Control-Allow-Origin", "*")
+        c.Header("Access-Control-Allow-Credentials", "true")
+        c.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+        c.Header("Access-Control-Allow-Methods", "POST,HEAD,PATCH, OPTIONS, GET, PUT")
+
+        if c.Request.Method == "OPTIONS" {
+            c.AbortWithStatus(204)
+            return
+        }
+
+        c.Next()
+    }
 }
 
 // func getRecipes(context *gin.Context) {
