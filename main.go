@@ -1,20 +1,21 @@
 package main
 
 import (
-    _"net/http"
-    _"github.com/gin-contrib/cors"
-    "github.com/gin-gonic/gin"
-    _"errors"
-    _"strconv"
-	_"context"
-    _"fmt"
-    _"log"
-    "go-recipes/lib"
-	_"go.mongodb.org/mongo-driver/bson"
-	_"go.mongodb.org/mongo-driver/mongo"
-    "bufio"
-    "os"
-    "strings"
+	"bufio"
+	_ "context"
+	_ "errors"
+	_ "fmt"
+	db "go-recipes/lib"
+	_ "log"
+	_ "net/http"
+	"os"
+	_ "strconv"
+	"strings"
+
+	_ "github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+	_ "go.mongodb.org/mongo-driver/bson"
+	_ "go.mongodb.org/mongo-driver/mongo"
 )
 
 // type Todo struct {
@@ -66,55 +67,50 @@ import (
 //     context.IndentedJSON(http.StatusOK, todo)
 // }
 
-
 func readInput() string {
-    reader := bufio.NewReader(os.Stdin)
-    text, _ := reader.ReadString('\n')
-    text = strings.Replace(text, "\n", "", -1)
-    return text
+	reader := bufio.NewReader(os.Stdin)
+	text, _ := reader.ReadString('\n')
+	text = strings.Replace(text, "\n", "", -1)
+	return text
 }
-
-
 
 // var coll *mongo.Collection = db.ConnectDB()
 func main() {
-    // recipes := db.GetRecipes()
-    // fmt.Println(recipes)
-    // recipe := db.GetRecipe(coll)
-    // fmt.Println(recipe)
-    // recipes := db.GetRecipes(coll)
-    // fmt.Println(recipes)
-    router := gin.Default()
-    router.Use(CORSMiddleware())
+	// recipes := db.GetRecipes()
+	// fmt.Println(recipes)
+	// recipe := db.GetRecipe(coll)
+	// fmt.Println(recipe)
+	// recipes := db.GetRecipes(coll)
+	// fmt.Println(recipes)
+	router := gin.Default()
+	router.Use(CORSMiddleware())
 
-    router.GET("/recipes", db.GetRecipes)
-    router.GET("/recipes/:name", db.GetRecipe)
-    // fmt.Println(recipes)
-    // router.GET("/api/recipes/{id}", GetTodo)
-    router.POST("/recipes", db.AddRecipe)
-    router.Run("localhost:9090")
+	router.GET("/recipes", db.GetRecipes)
+	router.GET("/recipes/:name", db.GetRecipe)
+	// fmt.Println(recipes)
+	// router.GET("/api/recipes/{id}", GetTodo)
+	router.POST("/recipes", db.AddRecipe)
+	router.Run("localhost:9090")
 }
 
 func CORSMiddleware() gin.HandlerFunc {
-    return func(c *gin.Context) {
+	return func(c *gin.Context) {
 
-        c.Header("Access-Control-Allow-Origin", "*")
-        c.Header("Access-Control-Allow-Credentials", "true")
-        c.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
-        c.Header("Access-Control-Allow-Methods", "POST,HEAD,PATCH, OPTIONS, GET, PUT")
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Credentials", "true")
+		c.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		c.Header("Access-Control-Allow-Methods", "POST,HEAD,PATCH, OPTIONS, GET, PUT")
 
-        if c.Request.Method == "OPTIONS" {
-            c.AbortWithStatus(204)
-            return
-        }
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
 
-        c.Next()
-    }
+		c.Next()
+	}
 }
 
 // func getRecipes(context *gin.Context) {
 //     recipes := db.GetRecipes(coll)
 //     context.IndentedJSON(http.StatusOK, recipes)
 // }
-
-
