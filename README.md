@@ -12,7 +12,8 @@ To implement routing, I used GO's Gin library. This allows me to call different 
 
 Build this app locally because the vm does not have enough ram to build remotely.
 
-    # Build command, specifiying the output to be amd64 linux since I'm running an ARM Mac and the resulting output is incompatible
+    # Build command, specifiying the output to be amd64 linux since I'm running an ARM Mac
+    #   and the resulting output is incompatible
     GOOS=linux GOARCH=amd64 go build -o gin
 
     # Run application and detatch to keep it running in the background
