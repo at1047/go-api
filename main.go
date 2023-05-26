@@ -5,7 +5,8 @@ import (
 	_ "context"
 	_ "errors"
 	_ "fmt"
-	db "go-recipes/lib"
+	dbrecipes "go-api/pkg/dbrecipes"
+	dbblog "go-api/pkg/dbblog"
 	_ "log"
 	_ "net/http"
 	"os"
@@ -85,11 +86,12 @@ func main() {
 	router := gin.Default()
 	router.Use(CORSMiddleware())
 
-	router.GET("/recipes", db.GetRecipes)
-	router.GET("/recipes/:name", db.GetRecipe)
+	router.GET("/recipes", dbrecipes.GetRecipes)
+	router.GET("/recipes/:name", dbrecipes.GetRecipe)
 	// fmt.Println(recipes)
 	// router.GET("/api/recipes/{id}", GetTodo)
-	router.POST("/recipes", db.AddRecipe)
+	router.POST("/recipes", dbrecipes.AddRecipe)
+	router.GET("/blogs", dbblog.GetBlogs)
 	router.Run("localhost:9090")
 }
 

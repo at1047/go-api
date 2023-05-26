@@ -1,4 +1,4 @@
-package db
+package dbblog
 
 import (
 	_ "bufio"
@@ -24,17 +24,16 @@ import (
 //     City string
 // }
 
-type Ingredient struct {
-	Name     string  `json:"name"`
-	Quantity float64 `json:"quantity"`
-	Unit     string  `json:"unit"`
-}
+// type Ingredient struct {
+// 	Name     string  `json:"name"`
+// 	Quantity float64 `json:"quantity"`
+// 	Unit     string  `json:"unit"`
+// }
 
-type Recipe struct {
-	Name        string       `json:"name"`
-	Ingredients []Ingredient `json:"ingredients"`
-	Notes       string       `json:"notes"`
-	Icon        string       `json:"icon"`
+type Blog struct {
+	Title       string  `json:"title"`
+	Content     string  `json:"content"`
+	Date        string  `json:"date"`
 }
 
 func ConnectDB() *mongo.Collection {
@@ -53,39 +52,39 @@ func ConnectDB() *mongo.Collection {
 	if err != nil {
 		log.Fatal(err)
 	}
-	coll := client.Database("recipes").Collection("recipes")
+	coll := client.Database("recipes").Collection("blog")
 	return coll
 }
 
 var coll *mongo.Collection = ConnectDB()
 
-func GetRecipe(ctx *gin.Context) {
-	fmt.Println("Getting single recipe")
+// func GetRecipe(ctx *gin.Context) {
+// 	fmt.Println("Getting single recipe")
+//
+// 	name := ctx.Param("name")
+// 	fmt.Println(name)
+//
+// 	var result Recipe
+// 	err := coll.FindOne(context.TODO(), bson.D{{"name", name}}).Decode(&result)
+//
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+//
+// 	ctx.IndentedJSON(http.StatusOK, result)
+// }
 
-	name := ctx.Param("name")
-	fmt.Println(name)
+func GetBlogs(ctx *gin.Context) {
+	fmt.Println("Getting multiple blogs")
 
-	var result Recipe
-	err := coll.FindOne(context.TODO(), bson.D{{"name", name}}).Decode(&result)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	ctx.IndentedJSON(http.StatusOK, result)
-}
-
-func GetRecipes(ctx *gin.Context) {
-	fmt.Println("Getting multiple recipes")
-
-	var results []Recipe
+	var results []Blog
 	cur, err := coll.Find(context.TODO(), bson.D{{}})
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	for cur.Next(context.TODO()) {
-		var elem Recipe
+		var elem Blog
 		err := cur.Decode(&elem)
 		if err != nil {
 			log.Fatal(err)
@@ -97,20 +96,20 @@ func GetRecipes(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, results)
 }
 
-func AddRecipe(ctx *gin.Context) {
-	var newRecipe Recipe
-
-	if err := ctx.BindJSON(&newRecipe); err != nil {
-		return
-	}
-
-	insertResult, err := coll.InsertOne(context.TODO(), newRecipe)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	ctx.IndentedJSON(http.StatusCreated, insertResult)
-}
+// func AddRecipe(ctx *gin.Context) {
+// 	var newRecipe Recipe
+//
+// 	if err := ctx.BindJSON(&newRecipe); err != nil {
+// 		return
+// 	}
+//
+// 	insertResult, err := coll.InsertOne(context.TODO(), newRecipe)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+//
+// 	ctx.IndentedJSON(http.StatusCreated, insertResult)
+// }
 
 // fmt.Println("Simple Shell")
 // fmt.Println("---------------------")
