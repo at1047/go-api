@@ -75,23 +75,17 @@ func readInput() string {
 	return text
 }
 
-// var coll *mongo.Collection = db.ConnectDB()
 func main() {
-	// recipes := db.GetRecipes()
-	// fmt.Println(recipes)
-	// recipe := db.GetRecipe(coll)
-	// fmt.Println(recipe)
-	// recipes := db.GetRecipes(coll)
-	// fmt.Println(recipes)
 	router := gin.Default()
 	router.Use(CORSMiddleware())
 
 	router.GET("/recipes", dbrecipes.GetRecipes)
 	router.GET("/recipes/:name", dbrecipes.GetRecipe)
-	// fmt.Println(recipes)
-	// router.GET("/api/recipes/{id}", GetTodo)
 	router.POST("/recipes", dbrecipes.AddRecipe)
+
 	router.GET("/blogs", dbblog.GetBlogs)
+  router.GET("/blogtitles", dbblog.GetBlogTitles)
+
 	router.Run("localhost:9090")
 }
 
@@ -111,8 +105,3 @@ func CORSMiddleware() gin.HandlerFunc {
 		c.Next()
 	}
 }
-
-// func getRecipes(context *gin.Context) {
-//     recipes := db.GetRecipes(coll)
-//     context.IndentedJSON(http.StatusOK, recipes)
-// }

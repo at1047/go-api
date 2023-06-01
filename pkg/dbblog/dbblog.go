@@ -96,6 +96,27 @@ func GetBlogs(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, results)
 }
 
+func GetBlogTitles(ctx *gin.Context) {
+	fmt.Println("Getting multiple blog titles")
+
+	var results []string
+	cur, err := coll.Find(context.TODO(), bson.D{{}})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for cur.Next(context.TODO()) {
+		var elem Blog
+		err := cur.Decode(&elem)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		results = append(results, elem.Title)
+	}
+	cur.Close(context.TODO())
+	ctx.IndentedJSON(http.StatusOK, results)
+}
 // func AddRecipe(ctx *gin.Context) {
 // 	var newRecipe Recipe
 //
