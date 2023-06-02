@@ -116,7 +116,9 @@ func GetProjectTitles(ctx *gin.Context) {
         {"projectCode", bson.D{{"$max", "$projectCode"}}},
     }}}
 
-	cur, err := coll.Aggregate(context.TODO(), mongo.Pipeline{groupStage})
+  sortStage := bson.D{{"$sort", bson.D{{"project", 1}}}}
+
+	cur, err := coll.Aggregate(context.TODO(), mongo.Pipeline{groupStage, sortStage})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -144,6 +146,7 @@ func GetProjectBlogTitles(ctx *gin.Context) {
 
  	projectCode := ctx.Param("projectCode")
   matchStage := bson.D{{"$match", bson.D{{"projectCode", projectCode}}}}
+  sortStage := bson.D{{"$sort", bson.D{{"date", -1}}}}
 
   groupStage := bson.D{
     {"$group", bson.D{
@@ -152,7 +155,7 @@ func GetProjectBlogTitles(ctx *gin.Context) {
         {"titleCode", bson.D{{"$max", "$titleCode"}}},
     }}}
 
-	cur, err := coll.Aggregate(context.TODO(), mongo.Pipeline{matchStage, groupStage})
+	cur, err := coll.Aggregate(context.TODO(), mongo.Pipeline{matchStage, groupStage, sortStage})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -181,7 +184,9 @@ func GetAllBlogTitles(ctx *gin.Context) {
         {"titleCode", bson.D{{"$max", "$titleCode"}}},
     }}}
 
-	cur, err := coll.Aggregate(context.TODO(), mongo.Pipeline{groupStage})
+  sortStage := bson.D{{"$sort", bson.D{{"title", 1}}}}
+
+	cur, err := coll.Aggregate(context.TODO(), mongo.Pipeline{groupStage, sortStage})
 	if err != nil {
 		log.Fatal(err)
 	}
