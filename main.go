@@ -83,8 +83,13 @@ func main() {
 	router.GET("/recipes/:name", dbrecipes.GetRecipe)
 	router.POST("/recipes", dbrecipes.AddRecipe)
 
-	router.GET("/blogs", dbblog.GetBlogs)
-  router.GET("/blogtitles", dbblog.GetBlogTitles)
+	router.GET("/blogs/:titleCode", dbblog.GetBlogContents)
+	router.GET("/blogs", dbblog.GetAllBlogContents)
+  router.GET("/blogtitles", dbblog.GetAllBlogTitles)
+  router.GET("/blogtitles/:projectCode", dbblog.GetProjectBlogTitles)
+
+  router.GET("/projects", dbblog.GetProjectTitles)
+
 
 	router.Run("localhost:9090")
 }

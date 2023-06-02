@@ -16,6 +16,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+  _ "go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // type Trainer struct {
@@ -30,11 +31,6 @@ import (
 // 	Unit     string  `json:"unit"`
 // }
 
-type Blog struct {
-	Title       string  `json:"title"`
-	Content     string  `json:"content"`
-	Date        string  `json:"date"`
-}
 
 func ConnectDB() *mongo.Collection {
 	if err := godotenv.Load(); err != nil {
@@ -58,26 +54,35 @@ func ConnectDB() *mongo.Collection {
 
 var coll *mongo.Collection = ConnectDB()
 
-// func GetRecipe(ctx *gin.Context) {
-// 	fmt.Println("Getting single recipe")
-//
-// 	name := ctx.Param("name")
-// 	fmt.Println(name)
-//
-// 	var result Recipe
-// 	err := coll.FindOne(context.TODO(), bson.D{{"name", name}}).Decode(&result)
-//
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-//
-// 	ctx.IndentedJSON(http.StatusOK, result)
-// }
+type Blog struct {
+  //ID    primitive.ObjectID `bson:"_id" json:"id,omitempty"`
+	Title       string  `json:"title"`
+	TitleCode       string  `json:"titleCode"`
+	Project       string  `json:"project"`
+	ProjectCode       string  `json:"projectCode"`
+	Content     string  `json:"content"`
+	Date        string  `json:"date"`
+}
+func GetBlogContents(ctx *gin.Context) {
+	fmt.Println("Getting single blog")
 
-func GetBlogs(ctx *gin.Context) {
-	fmt.Println("Getting multiple blogs")
+	titleCode := ctx.Param("titleCode")
+	fmt.Println(titleCode)
 
-	var results []Blog
+	var result Blog
+	err := coll.FindOne(context.TODO(), bson.D{{"titleCode", titleCode}}).Decode(&result)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ctx.IndentedJSON(http.StatusOK, result)
+}
+
+func GetAllBlogContents(ctx *gin.Context) {
+	fmt.Println("Getting all blogs")
+
+  var results []Blog
 	cur, err := coll.Find(context.TODO(), bson.D{{}})
 	if err != nil {
 		log.Fatal(err)
@@ -96,27 +101,120 @@ func GetBlogs(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, results)
 }
 
-func GetBlogTitles(ctx *gin.Context) {
-	fmt.Println("Getting multiple blog titles")
 
-	var results []string
-	cur, err := coll.Find(context.TODO(), bson.D{{}})
+type ProjectTitle struct {
+	Project       string  `json:"project"`
+	ProjectCode       string  `json:"projectCode"`
+}
+func GetProjectTitles(ctx *gin.Context) {
+	fmt.Println("Getting multiple blogs")
+	var results []ProjectTitle
+  groupStage := bson.D{
+    {"$group", bson.D{
+        {"_id", "$projectCode"},
+        {"project", bson.D{{"$max", "$project"}}},
+        {"projectCode", bson.D{{"$max", "$projectCode"}}},
+    }}}
+
+	cur, err := coll.Aggregate(context.TODO(), mongo.Pipeline{groupStage})
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	for cur.Next(context.TODO()) {
-		var elem Blog
+		var elem ProjectTitle
 		err := cur.Decode(&elem)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		results = append(results, elem.Title)
+		results = append(results, elem)
 	}
 	cur.Close(context.TODO())
 	ctx.IndentedJSON(http.StatusOK, results)
 }
+
+type BlogTitle struct {
+	Title       string  `json:"title"`
+	TitleCode       string  `json:"titleCode"`
+}
+func GetProjectBlogTitles(ctx *gin.Context) {
+	fmt.Println("Getting multiple blogs, filter by project")
+	var results []BlogTitle
+
+ 	projectCode := ctx.Param("projectCode")
+  matchStage := bson.D{{"$match", bson.D{{"projectCode", projectCode}}}}
+
+  groupStage := bson.D{
+    {"$group", bson.D{
+        {"_id", "$titleCode"},
+        {"title", bson.D{{"$max", "$title"}}},
+        {"titleCode", bson.D{{"$max", "$titleCode"}}},
+    }}}
+
+	cur, err := coll.Aggregate(context.TODO(), mongo.Pipeline{matchStage, groupStage})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for cur.Next(context.TODO()) {
+		var elem BlogTitle
+		err := cur.Decode(&elem)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		results = append(results, elem)
+	}
+	cur.Close(context.TODO())
+	ctx.IndentedJSON(http.StatusOK, results)
+}
+
+func GetAllBlogTitles(ctx *gin.Context) {
+	fmt.Println("Getting all blog titles")
+	var results []BlogTitle
+
+  groupStage := bson.D{
+    {"$group", bson.D{
+        {"_id", "$titleCode"},
+        {"title", bson.D{{"$max", "$title"}}},
+        {"titleCode", bson.D{{"$max", "$titleCode"}}},
+    }}}
+
+	cur, err := coll.Aggregate(context.TODO(), mongo.Pipeline{groupStage})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for cur.Next(context.TODO()) {
+		var elem BlogTitle
+		err := cur.Decode(&elem)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		results = append(results, elem)
+	}
+	cur.Close(context.TODO())
+	ctx.IndentedJSON(http.StatusOK, results)
+}
+
+
+// func GetProjectBlogTitles(ctx *gin.Context) {
+// 	fmt.Println("Getting single project blog titles")
+//  	project := ctx.Param("project")
+//   filter := bson.D{{"project", project}}
+//
+// 	results, err := coll.Distinct(context.TODO(), "title", filter)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+//
+// 	ctx.IndentedJSON(http.StatusOK, results)
+// }
+
+
+
 // func AddRecipe(ctx *gin.Context) {
 // 	var newRecipe Recipe
 //
