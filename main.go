@@ -89,6 +89,8 @@ func main() {
   router.GET("/blogtitles/:projectCode", dbblog.GetProjectBlogTitles)
 
   router.GET("/projects", dbblog.GetProjectTitles)
+	router.POST("/blogs", dbblog.AddBlog)
+	router.PUT("/blogs", dbblog.UpdateBlog)
 
 
 	router.Run("localhost:9090")

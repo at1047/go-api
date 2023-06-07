@@ -16,7 +16,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-  _ "go.mongodb.org/mongo-driver/bson/primitive"
+   "go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // type Trainer struct {
@@ -55,13 +55,13 @@ func ConnectDB() *mongo.Collection {
 var coll *mongo.Collection = ConnectDB()
 
 type Blog struct {
-  //ID    primitive.ObjectID `bson:"_id" json:"id,omitempty"`
-	Title       string  `json:"title"`
-	TitleCode       string  `json:"titleCode"`
-	Project       string  `json:"project"`
-	ProjectCode       string  `json:"projectCode"`
-	Content     string  `json:"content"`
-	Date        string  `json:"date"`
+  ID    primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+  Title       string  `bson:"title" "json:"title"`
+  TitleCode       string  `bson:"titleCode" json:"titleCode"`
+  Project       string  `bson:"project" json:"project"`
+  ProjectCode       string  `bson:"projectCode" json:"projectCode"`
+  Content     string  `bson:"content" json:"content"`
+  Date        string  `bson:"date" json:"date"`
 }
 func GetBlogContents(ctx *gin.Context) {
 	fmt.Println("Getting single blog")
@@ -129,7 +129,7 @@ func GetProjectTitles(ctx *gin.Context) {
 		if err != nil {
 			log.Fatal(err)
 		}
-
+    fmt.Println(elem)
 		results = append(results, elem)
 	}
 	cur.Close(context.TODO())
@@ -139,6 +139,7 @@ func GetProjectTitles(ctx *gin.Context) {
 type BlogTitle struct {
 	Title       string  `json:"title"`
 	TitleCode       string  `json:"titleCode"`
+	Date       string  `json:"date"`
 }
 func GetProjectBlogTitles(ctx *gin.Context) {
 	fmt.Println("Getting multiple blogs, filter by project")
@@ -146,11 +147,12 @@ func GetProjectBlogTitles(ctx *gin.Context) {
 
  	projectCode := ctx.Param("projectCode")
   matchStage := bson.D{{"$match", bson.D{{"projectCode", projectCode}}}}
-  sortStage := bson.D{{"$sort", bson.D{{"date", -1}}}}
+  sortStage := bson.D{{"$sort", bson.D{{"date", -1}, {"title", 1}}}}
 
   groupStage := bson.D{
     {"$group", bson.D{
         {"_id", "$titleCode"},
+        {"date", bson.D{{"$max", "$date"}}},
         {"title", bson.D{{"$max", "$title"}}},
         {"titleCode", bson.D{{"$max", "$titleCode"}}},
     }}}
@@ -220,65 +222,79 @@ func GetAllBlogTitles(ctx *gin.Context) {
 
 
 
-// func AddRecipe(ctx *gin.Context) {
-// 	var newRecipe Recipe
-//
-// 	if err := ctx.BindJSON(&newRecipe); err != nil {
-// 		return
-// 	}
-//
-// 	insertResult, err := coll.InsertOne(context.TODO(), newRecipe)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-//
-// 	ctx.IndentedJSON(http.StatusCreated, insertResult)
-// }
+func AddBlog(ctx *gin.Context) {
+	var newBlog Blog
 
-// fmt.Println("Simple Shell")
-// fmt.Println("---------------------")
+	if err := ctx.BindJSON(&newBlog); err != nil {
+		return
+	}
 
+	insertResult, err := coll.InsertOne(context.TODO(), newBlog)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ctx.IndentedJSON(http.StatusCreated, insertResult)
+}
+
+func UpdateBlog(ctx *gin.Context) {
+	var newBlog Blog
+
+	if err := ctx.BindJSON(&newBlog); err != nil {
+		return
+	}
+
+ 	id := newBlog.ID
+  filter := bson.D{{"_id", id}}
+
+  result, err := coll.UpdateOne(context.TODO(), filter, bson.M{"$set": newBlog})
+  if err != nil {
+    panic(err)
+  }
+
+	ctx.IndentedJSON(http.StatusCreated, result)
+}
 // fmt.Print("Recipe name: ")
 // recipeName := readInput()
-
+//
 // var ingredients []Ingredient
-
+//
 // for {
 //     fmt.Print("Add ingredient: ")
 //     ingredientName := readInput()
-
+//
 //     if strings.Compare("exit", ingredientName) == 0 {
 //         fmt.Println("Exiting...")
 //         break
 //     }
-
+//
 //     fmt.Print("Quantity: ")
 //     ingredientQuantity, _ := strconv.ParseFloat(readInput(), 32)
-
+//
 //     fmt.Print("Unit: ")
 //     ingredientUnit := readInput()
-
+//
 //     ingredient := Ingredient {
 //         Name: ingredientName,
 //         Quantity: ingredientQuantity,
 //         Unit: ingredientUnit,
 //     }
-
+//
 //     ingredients = append(ingredients, ingredient)
-
+//
 // }
-
+//
 // recipe := Recipe {
 //     Name: recipeName,
 //     Ingredients: ingredients,
 //     Notes: "",
 // }
-
+//
 // fmt.Println(recipe)
-
+//
 // // ash := Trainer{"Ash", 10, "Pallet Town"}
 // insertResult, err := coll.InsertOne(context.TODO(), recipe)
-
+//
 // if err != nil {
 // log.Fatal(err)
 // }
