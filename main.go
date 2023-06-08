@@ -82,6 +82,7 @@ func main() {
 	router.GET("/recipes", dbrecipes.GetRecipes)
 	router.GET("/recipes/:name", dbrecipes.GetRecipe)
 	router.POST("/recipes", dbrecipes.AddRecipe)
+	router.PUT("/recipes", dbrecipes.UpdateRecipe)
 
 	router.GET("/blogs/:titleCode", dbblog.GetBlogContents)
 	router.GET("/blogs", dbblog.GetAllBlogContents)

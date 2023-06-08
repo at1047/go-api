@@ -16,6 +16,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+  "go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // type Trainer struct {
@@ -31,6 +32,7 @@ type Ingredient struct {
 }
 
 type Recipe struct {
+  ID    primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
 	Name        string       `json:"name"`
 	Ingredients []Ingredient `json:"ingredients"`
 	Notes       string       `json:"notes"`
@@ -112,6 +114,23 @@ func AddRecipe(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusCreated, insertResult)
 }
 
+func UpdateRecipe(ctx *gin.Context) {
+	var newRecipe Recipe
+
+	if err := ctx.BindJSON(&newRecipe); err != nil {
+		return
+	}
+
+ 	id := newRecipe.ID
+  filter := bson.D{{"_id", id}}
+
+  result, err := coll.UpdateOne(context.TODO(), filter, bson.M{"$set": newRecipe})
+  if err != nil {
+    panic(err)
+  }
+
+	ctx.IndentedJSON(http.StatusCreated, result)
+}
 // fmt.Println("Simple Shell")
 // fmt.Println("---------------------")
 
