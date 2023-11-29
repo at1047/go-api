@@ -9,7 +9,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	_ "strconv"
+	"strconv"
 	_ "strings"
 	"time"
 
@@ -78,10 +78,10 @@ type Response struct {
 }
 
 type WeatherShort struct {
-	Time        string `json:"time"`
-	Temp        string `json:"temp"`
-	FeelsLike   string `json:"feels_like"`
-	Main        string `json:"main"`
+	Time      string `json:"time"`
+	Temp      string `json:"temp"`
+	FeelsLike string `json:"feels_like"`
+	// Main        string `json:"main"`
 	Description string `json:"description"`
 }
 
@@ -105,11 +105,13 @@ func GetWeather(ctx *gin.Context) {
 	// fmt.Println(PrettyPrint(result))
 	// fmt.Println(res.Body)
 
+	timeDiff, err := strconv.Atoi(os.Getenv("UTC_TIME_DIFF"))
+
 	data := WeatherShort{
-		Time:        time.Now().String(),
-		Temp:        fmt.Sprintf("%.2f", result.Main.Temp-273.15),
-		FeelsLike:   fmt.Sprintf("%.2f", result.Main.FeelsLike-273.15),
-		Main:        result.Weather[0].Main,
+		Time:      time.Now().Add(time.Hour * time.Duration(timeDiff)).Format("15:04 01/02/06"),
+		Temp:      fmt.Sprintf("%.2f", result.Main.Temp-273.15),
+		FeelsLike: fmt.Sprintf("%.2f", result.Main.FeelsLike-273.15),
+		// Main:        result.Weather[0].Main,
 		Description: result.Weather[0].Description,
 	}
 
