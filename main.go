@@ -5,8 +5,9 @@ import (
 	_ "context"
 	_ "errors"
 	_ "fmt"
-	dbrecipes "go-api/pkg/dbrecipes"
 	dbblog "go-api/pkg/dbblog"
+	dbrecipes "go-api/pkg/dbrecipes"
+	dbweather "go-api/pkg/dbweather"
 	_ "log"
 	_ "net/http"
 	"os"
@@ -75,23 +76,26 @@ func readInput() string {
 	return text
 }
 
-// var coll *mongo.Collection = db.ConnectDB()
 func main() {
-	// recipes := db.GetRecipes()
-	// fmt.Println(recipes)
-	// recipe := db.GetRecipe(coll)
-	// fmt.Println(recipe)
-	// recipes := db.GetRecipes(coll)
-	// fmt.Println(recipes)
 	router := gin.Default()
 	router.Use(CORSMiddleware())
 
 	router.GET("/recipes", dbrecipes.GetRecipes)
 	router.GET("/recipes/:name", dbrecipes.GetRecipe)
-	// fmt.Println(recipes)
-	// router.GET("/api/recipes/{id}", GetTodo)
 	router.POST("/recipes", dbrecipes.AddRecipe)
-	router.GET("/blogs", dbblog.GetBlogs)
+	router.PUT("/recipes", dbrecipes.UpdateRecipe)
+
+	router.GET("/blogs/:titleCode", dbblog.GetBlogContents)
+	router.GET("/blogs", dbblog.GetAllBlogContents)
+	router.GET("/blogtitles", dbblog.GetAllBlogTitles)
+	router.GET("/blogtitles/:projectCode", dbblog.GetProjectBlogTitles)
+
+	router.GET("/projects", dbblog.GetProjectTitles)
+	router.POST("/blogs", dbblog.AddBlog)
+	router.PUT("/blogs", dbblog.UpdateBlog)
+
+	router.GET("/weather", dbweather.GetWeather)
+
 	router.Run("localhost:9090")
 }
 
@@ -111,8 +115,3 @@ func CORSMiddleware() gin.HandlerFunc {
 		c.Next()
 	}
 }
-
-// func getRecipes(context *gin.Context) {
-//     recipes := db.GetRecipes(coll)
-//     context.IndentedJSON(http.StatusOK, recipes)
-// }
