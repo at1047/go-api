@@ -5,8 +5,9 @@ import (
 	_ "context"
 	_ "errors"
 	_ "fmt"
-	dbrecipes "go-api/pkg/dbrecipes"
 	dbblog "go-api/pkg/dbblog"
+	dbrecipes "go-api/pkg/dbrecipes"
+	dbweather "go-api/pkg/dbweather"
 	_ "log"
 	_ "net/http"
 	"os"
@@ -86,13 +87,14 @@ func main() {
 
 	router.GET("/blogs/:titleCode", dbblog.GetBlogContents)
 	router.GET("/blogs", dbblog.GetAllBlogContents)
-  router.GET("/blogtitles", dbblog.GetAllBlogTitles)
-  router.GET("/blogtitles/:projectCode", dbblog.GetProjectBlogTitles)
+	router.GET("/blogtitles", dbblog.GetAllBlogTitles)
+	router.GET("/blogtitles/:projectCode", dbblog.GetProjectBlogTitles)
 
-  router.GET("/projects", dbblog.GetProjectTitles)
+	router.GET("/projects", dbblog.GetProjectTitles)
 	router.POST("/blogs", dbblog.AddBlog)
 	router.PUT("/blogs", dbblog.UpdateBlog)
 
+	router.GET("/weather", dbweather.GetWeather)
 
 	router.Run("localhost:9090")
 }

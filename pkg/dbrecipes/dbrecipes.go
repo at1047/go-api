@@ -14,9 +14,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-  "go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // type Trainer struct {
@@ -32,11 +32,11 @@ type Ingredient struct {
 }
 
 type Recipe struct {
-  ID    primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
-	Name        string       `json:"name"`
-	Ingredients []Ingredient `json:"ingredients"`
-	Notes       string       `json:"notes"`
-	Icon        string       `json:"icon"`
+	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	Name        string             `json:"name"`
+	Ingredients []Ingredient       `json:"ingredients"`
+	Notes       string             `json:"notes"`
+	Icon        string             `json:"icon"`
 }
 
 func ConnectDB() *mongo.Collection {
@@ -121,16 +121,17 @@ func UpdateRecipe(ctx *gin.Context) {
 		return
 	}
 
- 	id := newRecipe.ID
-  filter := bson.D{{"_id", id}}
+	id := newRecipe.ID
+	filter := bson.D{{"_id", id}}
 
-  result, err := coll.UpdateOne(context.TODO(), filter, bson.M{"$set": newRecipe})
-  if err != nil {
-    panic(err)
-  }
+	result, err := coll.UpdateOne(context.TODO(), filter, bson.M{"$set": newRecipe})
+	if err != nil {
+		panic(err)
+	}
 
 	ctx.IndentedJSON(http.StatusCreated, result)
 }
+
 // fmt.Println("Simple Shell")
 // fmt.Println("---------------------")
 
