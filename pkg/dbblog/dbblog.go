@@ -33,7 +33,7 @@ import (
 
 
 func ConnectDB() *mongo.Collection {
-	if err := godotenv.Load(); err != nil {
+	if err := godotenv.Load(".env"); err != nil {
 		log.Println("No .env file found")
 	}
 	uri := fmt.Sprintf("mongodb+srv://%s:%s@%s/?retryWrites=true&w=majority", os.Getenv("USERNAME"), os.Getenv("PASSWORD"), os.Getenv("MONGODB_URI"))
