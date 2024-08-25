@@ -25,4 +25,17 @@ Build this app locally because the vm does not have enough ram to build remotely
     # Kill the application
     kill -9 your_pid
 
+To make the binary into a service, create file /etc/systemd/system/go-api.service
 
+    [Unit]
+    Description=Go API Service
+    
+    [Service]
+    Type=simple
+    Restart=no
+    User=andrew
+    WorkingDirectory=/home/andrew/applications/go-api
+    ExecStart=/home/andrew/applications/go-api/gin
+    
+    [Install]
+    WantedBy=multi-user.target
